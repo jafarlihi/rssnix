@@ -72,11 +72,11 @@ func UpdateFeed(name string, deleteFiles bool) {
 			continue
 		}
 		defer file.Close()
-    err = file.Chmod(0644)
-    if err != nil {
+		err = file.Chmod(0644)
+		if err != nil {
 			log.Error("Failed to change permissions for article titled '" + item.Title + "'")
-      continue
-    }
+			continue
+		}
 		_, err = file.WriteString(item.Description + "\n" + item.Link + "\n" + item.Published + "\n" + item.Content)
 		if err != nil {
 			log.Error("Failed to write content to a file for article titled '" + item.Title + "'")
