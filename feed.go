@@ -58,7 +58,7 @@ func UpdateFeed(name string, deleteFiles bool) {
 	if deleteFiles {
 		DeleteFeedFiles(name)
 	}
-	os.MkdirAll(Config.FeedDirectory+"/"+name, 0777)
+	os.MkdirAll(Config.FeedDirectory+"/"+name, 0755)
 	for _, item := range feed.Items {
 		articlePath := Config.FeedDirectory + "/" + name + "/" + truncateString(strings.ReplaceAll(item.Title, "/", ""), maxFileNameLength)
 		if _, err := os.Stat(articlePath); err == nil {
@@ -72,6 +72,11 @@ func UpdateFeed(name string, deleteFiles bool) {
 			continue
 		}
 		defer file.Close()
+		err = file.Chmod(0644)
+		if err != nil {
+			log.Error("Failed to change permissions for article titled '" + item.Title + "'")
+			continue
+		}
 		_, err = file.WriteString(item.Description + "\n" + item.Link + "\n" + item.Published + "\n" + item.Content)
 		if err != nil {
 			log.Error("Failed to write content to a file for article titled '" + item.Title + "'")
