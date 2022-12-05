@@ -18,7 +18,7 @@ You need to have Go >=1.19 installed.
 
 `git clone https://github.com/jafarlihi/rssnix --depth=1 && cd rssnix && go install`
 
-### Enabling Auto completion
+## Enabling Auto completion
 
 Bash:
 
