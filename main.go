@@ -212,6 +212,26 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:    "setup",
+				Aliases: []string{"s"},
+				Usage:   "sets up autocomplete",
+
+				Action: func(cCtx *cli.Context) error {
+					if cCtx.NArg() != 1 {
+						return cli.Exit("needs 1 argument, either 'bash' or 'zsh'", 1)
+					}
+					t := cCtx.Args().Get(0)
+					if t != "bash" && t != "zsh" {
+						return cli.Exit("argument has to be either 'bash' or 'zsh'", 1)
+					}
+					err := SetupAutocomplete(t)
+					if err != nil {
+						return cli.Exit(err, 1)
+					}
+					return nil
+				},
+			},
 		},
 	}
 
