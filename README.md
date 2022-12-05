@@ -18,6 +18,22 @@ You need to have Go >=1.19 installed.
 
 `git clone https://github.com/jafarlihi/rssnix --depth=1 && cd rssnix && go install`
 
+## Enabling Auto completion
+
+Bash:
+
+```bash
+rssnix setup bash
+source ~/.bashrc
+```
+
+Zsh:
+
+```bash
+rssnix setup zsh
+source ~/.zshrc
+```
+
 ## Packages
 
 <a href="https://aur.archlinux.org/packages/rssnix">Arch Linux AUR Package (build newest version)</a> <img src="https://img.shields.io/aur/version/rssnix?color=green" alt="AUR"> 

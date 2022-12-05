@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -36,11 +37,38 @@ func addFeed(name string, url string) error {
 	return err
 }
 
+func bashCompleteFeeds(cCtx *cli.Context) {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		log.Error("Failed to get home path")
+		os.Exit(1)
+	}
+	cfg, err := ini.Load(homePath + "/.config/rssnix/config.ini")
+	if err != nil {
+		// config not foud, no feeds there
+		return
+	}
+
+	args := cCtx.Args().Slice()
+	presentFeeds := map[string]bool{}
+	for _, feed := range args {
+		presentFeeds[feed] = true
+	}
+
+	for _, key := range cfg.Section("feeds").Keys() {
+		if _, ok := presentFeeds[key.Name()]; ok {
+			continue
+		}
+		fmt.Println(key.Name())
+	}
+}
+
 func main() {
 	syscall.Umask(0)
 	LoadConfig()
 
 	app := &cli.App{
+		EnableBashCompletion: true,
 		Commands: []*cli.Command{
 			{
 				Name:    "config",
@@ -76,6 +104,7 @@ func main() {
 					}
 					return nil
 				},
+				BashComplete: bashCompleteFeeds,
 			},
 			{
 				Name:    "update",
@@ -91,6 +120,7 @@ func main() {
 					}
 					return nil
 				},
+				BashComplete: bashCompleteFeeds,
 			},
 			{
 				Name:    "open",
@@ -108,6 +138,7 @@ func main() {
 					cmd.Stdout = os.Stdout
 					return cmd.Run()
 				},
+				BashComplete: bashCompleteFeeds,
 			},
 			{
 				Name:    "add",
@@ -178,6 +209,26 @@ func main() {
 				Usage:   "display the version",
 				Action: func(cCtx *cli.Context) error {
 					log.Info(Version)
+					return nil
+				},
+			},
+			{
+				Name:    "setup",
+				Aliases: []string{"s"},
+				Usage:   "sets up autocomplete",
+
+				Action: func(cCtx *cli.Context) error {
+					if cCtx.NArg() != 1 {
+						return cli.Exit("needs 1 argument, either 'bash' or 'zsh'", 1)
+					}
+					t := cCtx.Args().Get(0)
+					if t != "bash" && t != "zsh" {
+						return cli.Exit("argument has to be either 'bash' or 'zsh'", 1)
+					}
+					err := SetupAutocomplete(t)
+					if err != nil {
+						return cli.Exit(err, 1)
+					}
 					return nil
 				},
 			},
